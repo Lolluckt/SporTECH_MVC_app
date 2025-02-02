@@ -1,0 +1,80 @@
+﻿@model Order
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+<h2 style="text-align: center; margin-bottom: 20px;">Деталі заказу</h2>
+
+<div style="max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
+    <p><strong>Клієнт:</strong> @(Model.ClientDetails?.FirstName ?? "Неизвестно") @(Model.ClientDetails?.LastName ?? "Неизвестно")</p>
+    <p><strong>Телефон:</strong> @(Model.ClientDetails?.PhoneNumber ?? "Не указано")</p>
+    <p><strong>Email:</strong> @(Model.ClientDetails?.Email ?? "Не указано")</p>
+    <p><strong>Адреса:</strong> @(Model.ClientDetails?.Address ?? "Не указано")</p>
+    <p><strong>Дата заказа:</strong> @Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+    <p><strong>Статус:</strong> @Model.Status</p>
+    <p><strong>Заказ сформований:</strong> @(Model.Manager?.Username ?? "Неизвестно")</p>
+
+    <h3 style="margin-top: 20px;">Деталі заказу</h3>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead style="background-color: #f2f2f2;">
+            <tr>
+                <th style="padding: 10px; border: 1px solid #ddd;">Тренажер</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Опис</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Фото</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Кількість</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Ціна</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+            {
+                foreach (var detail in Model.OrderDetails)
+                {
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            @(detail.Trainer?.Name ?? "Невідомо")
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            @(detail.Trainer?.Description ?? "Опис відсутній")
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            @if (!string.IsNullOrEmpty(detail.Trainer?.ImagePath))
+                            {
+                                <img src="@detail.Trainer.ImagePath" alt="@detail.Trainer?.Name" style="max-width: 100px;" />
+                            }
+                            else
+                            {
+                                <span>Нема зображення</span>
+                            }
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">@detail.Quantity</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">@detail.Price.ToString("C")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" style="padding: 10px; text-align: center; border: 1px solid #ddd;">
+                        Деталі замовлення відсутні
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div style="text-align: center; margin-top: 20px;">
+    <div style="text-align: center; margin-top: 20px;">
+        @{
+            if (User.IsInRole("SuperAdmin") || User.IsInRole("SalesManager"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary" style="padding: 10px 20px; font-size: 16px; text-decoration: none; color: white;">Редагувати замовлення</a>
+            }
+            else
+            {
+                <span style="color: gray; display: inline-block; padding: 10px 20px; border: 1px solid #ccc; border-radius: 5px;">Редагування недоступно</span>
+            }
+        }
+        <a asp-action="Index" class="btn btn-secondary" style="padding: 10px 20px; font-size: 16px; text-decoration: none; color: white;">Повернутися до списку</a>
+    </div>
+
+</div>

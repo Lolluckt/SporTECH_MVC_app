@@ -1,0 +1,120 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: url('/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    background-color: #000000 !important;
+    color: #f8f9fa !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+    .navbar a {
+        color: #f8f9fa !important;
+        font-weight: bold;
+        transition: color 0.3s ease;
+    }
+
+        .navbar a:hover {
+            color: #e0e0e0 !important;
+            text-decoration: none;
+        }
+
+
+.nav-button {
+    background-color: #ff5722;
+    color: #ffffff !important;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .nav-button:hover {
+        background-color: #e64a19;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #000000 !important;
+    color: #f8f9fa;
+    padding: 10px 0;
+    text-align: center;
+    z-index: 999;
+}
+
+    footer a {
+        color: #f8f9fa;
+        text-decoration: none;
+    }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: #e0e0e0;
+        }
+
+.container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: transform 0.2s;
+    margin: 15px;
+}
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+.back-button {
+    margin-bottom: 20px;
+}
+
+
+body::after {
+    content: "";
+    display: block;
+    height: 120px;
+}
+
+footer {
+    margin-top: 100px;
+}

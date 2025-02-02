@@ -1,0 +1,135 @@
+﻿@model WebApplication1.Models.Order
+
+@{
+    ViewData["Title"] = "Создать заказ";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Створити замовлення</h2>
+    <form asp-action="Create" method="post" onsubmit="return validateForm()">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="firstName">Ім'я клієнта'</label>
+                    <input id="firstName" name="firstName" type="text" class="form-control" required />
+                    <small id="firstNameError" class="text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Прізвище клієнта</label>
+                    <input id="lastName" name="lastName" type="text" class="form-control" required />
+                    <small id="lastNameError" class="text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Телефон</label>
+                    <input id="phoneNumber" name="phoneNumber" type="text" class="form-control" required />
+                    <small id="phoneError" class="text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label for="address">Адреса</label>
+                    <input id="address" name="address" type="text" class="form-control" required />
+                    <small id="addressError" class="text-danger"></small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4>Тренажери</h4>
+                <div class="form-group">
+                    <label for="trainerSelect">Виберіть тренажер</label>
+                    <select id="trainerSelect" class="form-control" onchange="updateSelectedTrainer()">
+                        <option disabled selected>Виберіть тренажер</option>
+                        @foreach (var trainer in ViewBag.Trainers)
+                        {
+                            <option value="@trainer.Id" data-quantity="@trainer.Inventory.Quantity" data-name="@trainer.Name" data-description="@trainer.Description">
+                                @trainer.Name (Доступно: @trainer.Inventory.Quantity)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div id="selectedTrainer" class="mt-3" style="display: none;">
+                    <div class="form-group">
+                        <label>Обраний тренажер</label>
+                        <input id="trainerName" type="text" class="form-control" readonly />
+                        <input id="trainerId" type="hidden" name="trainerIds" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantityInput">Кількість</label>
+                        <input id="quantityInput" name="quantities" type="number" class="form-control" min="1" required />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Створити замовлення</button>
+        </div>
+    </form>
+</div>
+
+<script>
+        function validateForm() {
+        let isValid = true;
+
+        const nameRegex = /^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ']+$/;
+        const phoneRegex = /^\d{10}$/;
+        const addressRegex = /^(вул\.|просп\.)/;
+
+        const firstName = document.getElementById("firstName").value;
+        if (!nameRegex.test(firstName)) {
+            document.getElementById("firstNameError").innerText = "Ім'я повинне містити лише букви.";
+            isValid = false;
+        } else {
+            document.getElementById("firstNameError").innerText = "";
+        }
+
+        const lastName = document.getElementById("lastName").value;
+        if (!nameRegex.test(lastName)) {
+            document.getElementById("lastNameError").innerText = "Прізвище повинне містити лише букви.";
+            isValid = false;
+        } else {
+            document.getElementById("lastNameError").innerText = "";
+        }
+
+        const phoneNumber = document.getElementById("phoneNumber").value;
+        if (!phoneRegex.test(phoneNumber)) {
+            document.getElementById("phoneError").innerText = "Телефон повинен містити 10 цифр.";
+            isValid = false;
+        } else {
+            document.getElementById("phoneError").innerText = "";
+        }
+
+        const address = document.getElementById("address").value;
+        if (!addressRegex.test(address)) {
+            document.getElementById("addressError").innerText = "Адреса повинна починатися з 'вул.' або 'просп.'.";
+            isValid = false;
+        } else {
+            document.getElementById("addressError").innerText = "";
+        }
+
+        return isValid;
+    }
+
+    function updateSelectedTrainer() {
+        const trainerSelect = document.getElementById("trainerSelect");
+        const selectedOption = trainerSelect.options[trainerSelect.selectedIndex];
+
+        if (selectedOption) {
+            const trainerId = selectedOption.value;
+            const trainerName = selectedOption.getAttribute("data-name");
+            const maxQuantity = selectedOption.getAttribute("data-quantity");
+
+            document.getElementById("selectedTrainer").style.display = "block";
+            document.getElementById("trainerName").value = `${trainerName} (Доступно: ${maxQuantity})`;
+            document.getElementById("trainerId").value = trainerId;
+
+            const quantityInput = document.getElementById("quantityInput");
+            quantityInput.value = "";
+            quantityInput.max = maxQuantity;
+        }
+    }
+</script>

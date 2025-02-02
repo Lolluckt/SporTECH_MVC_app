@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Вход";
+}
+
+<div class="d-flex justify-content-center" style="margin-top: 10vh;">
+    <div class="card shadow p-4" style="width: 24rem; border-radius: 12px;">
+        <h3 class="text-center mb-4">@ViewData["Title"]</h3>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger" style="padding: 10px; border: 1px solid #f5c2c7; border-radius: 8px; font-size: 14px;">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p style="margin: 0;">@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+            <div class="form-group mb-3">
+                <label for="username" class="form-label">Ім'я користувача:</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Введіть ім'я'" required style="height: 2.5rem;">
+            </div>
+            <div class="form-group mb-3">
+                <label for="password" class="form-label">Пароль:</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Введіть пароль" required style="height: 2.5rem;">
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary w-100" style="height: 2.5rem;">Війти</button>
+            </div>
+        </form>
+    </div>
+</div>

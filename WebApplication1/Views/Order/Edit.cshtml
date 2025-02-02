@@ -1,0 +1,101 @@
+﻿@model Order
+@{
+    ViewBag.Title = "Редактировать заказ";
+}
+
+<h2 style="text-align: center; margin-bottom: 20px;">Редагувати замовлення</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ClientDetailsId" />
+
+    <h3>Інформація про клієнта</h3>
+    <div style="max-width: 600px; margin: auto;">
+        <label>Ім'я</label>
+        <input asp-for="ClientDetails.FirstName" class="form-control" required />
+        <label>Прізвище</label>
+        <input asp-for="ClientDetails.LastName" class="form-control" required />
+        <label>Телефон</label>
+        <input asp-for="ClientDetails.PhoneNumber" class="form-control" required />
+        <label>Email</label>
+        <input asp-for="ClientDetails.Email" class="form-control" required />
+        <label>Адреса</label>
+        <input asp-for="ClientDetails.Address" class="form-control" required />
+    </div>
+
+    <h3 style="margin-top: 20px;">Статус заказа</h3>
+    <div style="max-width: 600px; margin: auto;">
+        <label>Статус</label>
+        <select asp-for="Status" class="form-control">
+            @foreach (var status in new[] { "Новый", "В процессе", "Завершен" })
+            {
+                <option value="@status" selected="@(Model.Status == status ? "selected" : null)">@status</option>
+            }
+        </select>
+    </div>
+
+    <h3 style="margin-top: 20px;">Деталі замовлення</h3>
+    @{
+        var orderDetailsList = Model.OrderDetails.ToList();
+    }
+    <div id="trainersContainer">
+        @for (int i = 0; i < orderDetailsList.Count; i++)
+        {
+            <div class="trainer-row mb-3">
+                <select name="trainerIds" class="form-control d-inline-block" style="width: 60%;">
+                    <option value="">Виберіть тренажер</option>
+                    @foreach (var trainer in ViewBag.Trainers)
+                    {
+                        <option value="@trainer.Id" selected="@(orderDetailsList[i].TrainerId == trainer.Id ? "selected" : null)">
+                            @trainer.Name (Доступно: @trainer.Quantity)
+                        </option>
+                    }
+                </select>
+                <input type="number" name="quantities" class="form-control d-inline-block" style="width: 30%;" min="1" value="@orderDetailsList[i].Quantity" />
+                <button type="button" class="btn btn-danger remove-trainer">Видалити</button>
+            </div>
+        }
+    </div>
+
+
+    <button type="button" class="btn btn-primary" id="addTrainerButton">+ Додати тренажер</button>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button type="submit" class="btn btn-success">Зберегти</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Відміна</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const trainersContainer = document.getElementById('trainersContainer');
+            const addTrainerButton = document.getElementById('addTrainerButton');
+            const trainers = @Html.Raw(Json.Serialize(ViewBag.Trainers));
+
+            addTrainerButton.addEventListener('click', () => {
+                const trainerRow = document.createElement('div');
+                trainerRow.className = 'trainer-row mb-3';
+
+                trainerRow.innerHTML = `
+                    <select name="trainerIds" class="form-control d-inline-block" style="width: 60%;">
+                        <option value="">Выберите тренажер</option>
+                        ${trainers.map(trainer => `<option value="${trainer.id}">${trainer.name} (Доступно: ${trainer.quantity})</option>`).join('')}
+                    </select>
+                    <input type="number" name="quantities" class="form-control d-inline-block" style="width: 30%;" min="1" value="1" />
+                    <button type="button" class="btn btn-danger remove-trainer">Удалить</button>
+                `;
+                trainersContainer.appendChild(trainerRow);
+
+                trainerRow.querySelector('.remove-trainer').addEventListener('click', () => {
+                    trainerRow.remove();
+                });
+            });
+
+            document.querySelectorAll('.remove-trainer').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.target.closest('.trainer-row').remove();
+                });
+            });
+        });
+    </script>
+
+</form>

@@ -1,0 +1,239 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model IEnumerable<WebApplication1.Models.Trainer>
+
+@{
+    ViewData["Title"] = "Список тренажеров";
+    var currentSortField = ViewBag.SortField as string ?? "";
+    var currentSortOrder = ViewBag.SortOrder as string ?? "asc";
+}
+
+<div class="container-fluid">
+    <div class="row no-gutters">
+        <div class="col-2 ml-n3">
+            <div class="border p-3">
+                <h5>Сортування</h5>
+                <form method="get" asp-action="Index" asp-controller="Trainer">
+                    <div class="form-group">
+                        <label for="sortField">Поле сортування:</label>
+                        <select name="sortField" id="sortField" class="form-control">
+                            <option value="">По назві</option>
+                            @if (currentSortField == "Price")
+                            {
+                                <option value="Price" selected>По ціні</option>
+                            }
+                            else
+                            {
+                                <option value="Price">По ціні</option>
+                            }
+                            @if (currentSortField == "Quantity")
+                            {
+                                <option value="Quantity" selected>По кількості</option>
+                            }
+                            else
+                            {
+                                <option value="Quantity">По кількості</option>
+                            }
+                            @if (currentSortField == "Type")
+                            {
+                                <option value="Type" selected>По типу</option>
+                            }
+                            else
+                            {
+                                <option value="Type">По типу</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-2">
+                        <label>Порядок:</label><br />
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="sortOrder" value="asc" @(currentSortOrder == "asc" ? "checked" : "")>
+                            <label class="form-check-label">За зростанням</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="sortOrder" value="desc" @(currentSortOrder == "desc" ? "checked" : "")>
+                            <label class="form-check-label">За спаданням</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">Застосувати</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-10 pl-3">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <form method="get" asp-action="Index" asp-controller="Trainer" class="d-flex">
+                        <input type="text" name="searchQuery" value="@ViewBag.SearchQuery" placeholder="Пошук по назві..." class="form-control me-2" />
+                        <button type="submit" class="btn btn-primary">Пошук</button>
+                    </form>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Тип</th>
+                        <th>Ціна</th>
+                        <th>Кількість</th>
+                        <th>Зображення</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var trainer in Model)
+                    {
+                        var adminAuthResult = AuthorizationService.AuthorizeAsync(User, "AdminPolicy").Result;
+                        <tr class="clickable-row" data-href="@Url.Action("Details", new { id = trainer.Id })">
+                            <td>@trainer.Name</td>
+                            <td>@trainer.Type</td>
+                            <td>@trainer.Price.ToString("C")</td>
+                            <td>@trainer.Quantity</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(trainer.ImagePath))
+                                {
+                                    <img src="@trainer.ImagePath" alt="Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <span class="no-image-warning" title="Зображення відсутнє">
+                                        ⚠️
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (adminAuthResult.Succeeded)
+                                {
+                                    <a href="@Url.Action("Edit", new { id = trainer.Id })" class="btn btn-warning btn-actions">Редагувати</a>
+                                    <form asp-action="Delete" asp-controller="Trainer" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@trainer.Id" />
+                                        <button type="submit" class="btn btn-danger btn-actions" onclick="return confirm('Вы уверены, что хотите удалить?');">Видалити</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="color:gray;">Недоступно</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .clickable-row {
+        cursor: pointer;
+    }
+
+    .clickable-row:hover {
+        background-color: #f0f8ff;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.closest('a.btn') || target.closest('form')) {
+                    return;
+                }
+                const href = row.getAttribute('data-href');
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .table {
+        width: 100%;
+        table-layout: fixed;
+        margin: 0 auto;
+    }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            word-wrap: break-word;
+            text-align: center;
+        }
+
+        .table img {
+            display: block;
+            margin: auto;
+        }
+
+    .btn {
+        padding: 5px 10px;
+        font-size: 14px;
+        margin: 2px;
+    }
+
+    .clickable-row {
+        cursor: pointer;
+    }
+
+        .clickable-row:hover {
+            background-color: #f0f8ff;
+        }
+
+    .btn-actions {
+        display: inline-block;
+        width: 120px;
+        text-align: center;
+        margin: 2px;
+        padding: 6px 0;
+        font-size: 14px;
+        border-radius: 5px;
+    }
+
+    .btn-warning {
+        background-color: #fbc02d;
+        color: black;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #e53935;
+        color: black;
+        border: none;
+    }
+
+    .btn-warning:hover {
+        background-color: #f9a825;
+        color: black;
+    }
+
+    .btn-danger:hover {
+        background-color: #d32f2f;
+        color: black;
+    }
+
+    .no-image-warning {
+        display: inline-block;
+        color: orange;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+        .no-image-warning:hover::after {
+            content: attr(title);
+            position: absolute;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 5px 10px;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+</style>

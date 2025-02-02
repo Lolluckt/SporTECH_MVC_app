@@ -1,0 +1,101 @@
+﻿@model IEnumerable<Order>
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+<h2 style="text-align: center; margin-bottom: 20px;">Всі замовлення</h2>
+
+<form method="get" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+    <input type="text" name="clientName" placeholder="Ім'я клієнта" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;" />
+    <input type="text" name="trainerName" placeholder="Назва тренажера" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;" />
+    <input type="text" name="phoneNumber" placeholder="Телефон" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;" />
+    <select name="status" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+        <option value="">Все</option>
+        <option value="Новый">Новый</option>
+        <option value="В процессе">В процессе</option>
+        <option value="Завершен">Завершен</option>
+    </select>
+    <button type="submit" style="background-color: #4CAF50; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer;">Поиск</button>
+    <button type="submit" formaction="/Order/Index" style="background-color: #f44336; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer;">Сброс</button>
+</form>
+
+@if (ViewBag.SearchMessage != null)
+{
+    <div style="text-align: center; color: red; margin-top: 20px; font-size: 16px;">
+        @ViewBag.SearchMessage
+    </div>
+}
+
+<table style="width: 100%; border-collapse: collapse; margin: auto; text-align: center;">
+    <thead style="background-color: #f2f2f2;">
+        <tr>
+            <th style="padding: 10px; border: 1px solid #ddd;">Клієнт</th>
+            <th style="padding: 10px; border: 1px solid #ddd;">Дата</th>
+            <th style="padding: 10px; border: 1px solid #ddd;">Статус</th>
+            <th style="padding: 10px; border: 1px solid #ddd;">Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            var hasEmptyOrderDetails = order.OrderDetails == null || !order.OrderDetails.Any();
+            var hasDeletedTrainer = order.OrderDetails != null && order.OrderDetails.Any(od => od.Trainer == null);
+
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">@order.ClientDetails?.FirstName @order.ClientDetails?.LastName</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">@order.OrderDate</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                    @if (hasEmptyOrderDetails)
+                    {
+
+                        <span class="text-warning" title="Схоже тренажер було видалено">
+                            ⚠️ Немає даних
+                        </span>
+                    }
+                    else
+                    {
+                        @order.Status
+                    }
+                </td>
+                <td style="padding: 10px; border: 1px solid #ddd;">
+                    <a asp-action="Details" asp-route-id="@order.Id" style="color: #2196F3; text-decoration: none;">Деталі</a>
+                    @{
+                        if (User.IsInRole("SuperAdmin") || User.IsInRole("SalesManager"))
+                        {
+                            
+                            <a asp-action="ConfirmDelete" asp-route-id="@order.Id" class="btn btn-danger btn-sm">Видалити</a>
+                        }
+                        else 
+                        {
+                            <span style="color: gray; display: inline-block; margin-left: 10px;">Недоступно</span>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    .text-danger {
+        color: red;
+        cursor: pointer;
+    }
+
+    .text-warning {
+        color: orange;
+        cursor: pointer;
+    }
+
+        .text-warning:hover::after,
+        .text-danger:hover::after {
+            content: attr(title);
+            position: absolute;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+</style>

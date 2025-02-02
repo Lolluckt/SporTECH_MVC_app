@@ -1,0 +1,45 @@
+﻿@model IEnumerable<WebApplication1.Models.User>
+
+<h2>Список пользователей</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.Username</td>
+                <td>@user.Role</td>
+                <td>
+                    @if (User.IsInRole("SuperAdmin"))
+                    {
+                        if (User.Identity.Name == user.Username)
+                        {
+                            <button type="button" class="btn btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                Видалити
+                            </button>
+                        }
+                        else
+                        {
+                            <form asp-action="DeleteUser" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@user.Id" />
+                                <button type="submit" class="btn btn-danger">Видалити</button>
+                            </form>
+                        }
+                    }
+                    else
+                    {
+                        <span style="color:gray;">Недоступно</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

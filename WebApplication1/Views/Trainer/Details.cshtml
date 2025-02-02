@@ -1,0 +1,19 @@
+﻿@model WebApplication1.Models.Trainer
+
+<div class="container">
+    <a asp-action="Index" class="btn btn-primary back-button">Назад</a>
+    <div class="card">
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" class="card-img-top" alt="@Model.Name" style="max-width:300px; height:auto; object-fit:cover; margin:auto; display:block;">
+        }
+        <div class="card-body">
+            <h5 class="card-title">@Model.Name</h5>
+            <p class="card-text"><strong>Опис:</strong> @Model.Description</p>
+            <p class="card-text"><strong>Тип:</strong> @Model.Type</p>
+            <p class="card-text"><strong>Ціна:</strong> @Model.Price ₴</p>
+            <p class="card-text"><strong>Собівартість:</strong> @Model.ProductionCost ₴</p>
+            <p class="card-text"><strong>Кількість:</strong> @Model.Quantity</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,179 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Отчет по заказам";
+    var reportType = ViewBag.ReportType as string;
+}
+
+<h2 style="text-align: center; margin-bottom: 20px;">Отчет по заказам</h2>
+
+<div style="margin-bottom: 20px; text-align: center;">
+    <form method="get" asp-action="Report" style="display: inline-flex; gap: 10px;">
+        <select name="reportType" class="form-control">
+            <option value="summary" selected="@(reportType == "summary")">Звіт по статусам</option>
+            <option value="clients" selected="@(reportType == "clients")">Звіт по клієнтам</option>
+            <option value="profits" selected="@(reportType == "profits")">Звіт продаж</option>
+            <option value="realized" selected="@(reportType == "realized")">Звіт по реалізації</option>
+            <option value="popular" selected="@(reportType == "popular")">Найпопулярніший тренажер</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Показати</button>
+    </form>
+    <form asp-action="GeneratePdfReport" method="post" style="margin-top: 20px;">
+        <button type="submit" class="btn btn-danger">
+            Завантажити детальний звіт (PDF)
+        </button>
+    </form>
+</div>
+
+@if (reportType == "clients")
+{
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <th>Клієнт</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Адреса</th>
+                <th>Всього замовлень</th>
+                <th>Загальна сума</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in Model)
+            {
+                <tr>
+                    <td>@client.ClientName</td>
+                    <td>@client.Email</td>
+                    <td>@client.PhoneNumber</td>
+                    <td>@client.Address</td>
+                    <td>@client.TotalOrders</td>
+                    <td>@client.TotalSpent.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (reportType == "profits")
+{
+    <h3 style="text-align: center;">Звіт продаж</h3>
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <th>Тренажер</th>
+                <th>Ціна за одиницю</th>
+                <th>Продано одиниць</th>
+                <th>Загальна виручка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var profit in Model)
+            {
+                <tr>
+                    <td>@profit.TrainerName</td>
+                    <td>@profit.UnitPrice.ToString("C")</td>
+                    <td>@profit.TotalSold</td>
+                    <td>@profit.TotalRevenue.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (reportType == "realized")
+{
+    <h3 style="text-align: center;">Звіт по реалізації</h3>
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <th>ID Заказа</th>
+                <th>Клієнт</th>
+                <th>Загальна кількість тренажерів</th>
+                <th>Сума заказу</th>
+                <th>Фото тренажерів</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.Client</td>
+                    <td>@order.TotalTrainers</td>
+                    <td>@order.TotalPrice.ToString("C")</td>
+                    <td>
+                        @foreach (var image in order.TrainerImages)
+                        {
+                            <img src="@image" alt="Тренажер" style="width: 100px; height: 100px; object-fit: cover; margin-right: 5px;" />
+                        }
+                    </td>
+                    <td>@order.Status</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">Загальна виручка:</td>
+                <td colspan="1" style="font-weight: bold;">@ViewBag.TotalRevenue.ToString("C")</td>
+            </tr>
+        </tfoot>
+    </table>
+}
+@if (reportType == "popular")
+{
+    <div style="text-align: center; font-size: 20px; font-weight: bold;">
+        <p>Найпопулярніший тренажер: <span>@Model?.TrainerName</span></p>
+        <p>Загальна кількість замовлень: <span>@Model?.TotalOrdered</span></p>
+        @if (!string.IsNullOrEmpty(Model?.TrainerImage))
+        {
+            <img src="@Model.TrainerImage" alt="@Model?.TrainerName" style="max-width: 200px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px;" />
+        }
+        else
+        {
+            <p>Немає зображення</p>
+        }
+    </div>
+}
+@if (reportType == "summary")
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Статус</th>
+                <th>Всього замовлень</th>
+                <th>Загальна виручка</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var summary in Model)
+            {
+                <tr>
+                    <td>@summary.Status</td>
+                    <td>@summary.TotalOrders</td>
+                    <td>@summary.TotalRevenue.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<style>
+    table {
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    select, button {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        background-color: #4CAF50;
+        color: white;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #45a049;
+        }
+</style>

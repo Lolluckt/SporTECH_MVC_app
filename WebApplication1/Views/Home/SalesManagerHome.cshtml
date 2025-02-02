@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Sales Manager Dashboard";
+}
+
+<div class="container text-center" style="margin-top: 50px;">
+    <div class="card p-4 shadow-lg bg-white rounded">
+        <h1 class="mb-4">Ласкаво просимо, Менеджер з продаж!</h1>
+        <p>Тут ви можете керувати замовленнями та переглядати список тренажерів.</p>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-3 mb-3">
+                <a asp-controller="Trainer" asp-action="Index" class="btn btn-primary btn-lg btn-block shadow-sm">
+                    Переглянути тренажери
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a asp-controller="Order" asp-action="Create" class="btn btn-warning btn-lg btn-block shadow-sm text-dark">
+                    Створити замовлення
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a asp-controller="Order" asp-action="Index" class="btn btn-success btn-lg btn-block shadow-sm">
+                    Переглянути замовлення
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+﻿@model WebApplication1.Models.Order
+
+<h3>Ви впевнені що хочете видалити це замовлення?</h3>
+
+<div>
+    <h4>Замовлення: @Model.Id</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Клієнт</dt>
+        <dd class="col-sm-10">@Model.ClientDetails.FirstName @Model.ClientDetails.LastName</dd>
+        <dt class="col-sm-2">Дата</dt>
+        <dd class="col-sm-10">@Model.OrderDate</dd>
+    </dl>
+
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+        <button type="submit" class="btn btn-danger">Видалити</button>
+        <a asp-action="Index" class="btn btn-secondary">Відміна</a>
+    </form>
+</div>

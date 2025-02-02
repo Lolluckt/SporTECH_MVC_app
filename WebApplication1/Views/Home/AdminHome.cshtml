@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container">
+    <h1 class="text-center">Ласкаво просимо, Адміністратор!</h1>
+    <p class="text-center">Тут ви можете керувати тренажерами, продивлюватись замовлення та користувачів.</p>
+    <div class="d-flex justify-content-center">
+        <a asp-action="Create" asp-controller="Trainer" class="btn btn-primary m-2">Додати новий тренажер</a>
+        <a asp-action="Index" asp-controller="Trainer" class="btn btn-secondary m-2">Переглянути тренажери</a>
+        <a asp-controller="Order" asp-action="Index" class="btn btn-primary m-2">Переглянути замовлення</a>
+        <a asp-action="Users" asp-controller="Account" class="btn btn-dark m-2">Переглянути користувачів</a>
+    </div>
+</div>
